@@ -13,7 +13,7 @@ trait Endpoints {
   def possibility: UIO[Endpoint[Month, FailureResp, List[HurricanePossibility], Nothing]]
 }
 
-case class MostHurricanes(year: Int, month: Int)
+case class MostHurricanes(year: Year, month: Month)
 
 case class HurricanePossibility(value: Double)
 
