@@ -1,5 +1,6 @@
 package hurricane
 
+import com.github.tototoshi.csv.{CSVFormat, DefaultCSVFormat, QUOTE_MINIMAL, QUOTE_NONNUMERIC, Quoting}
 import com.typesafe.config.ConfigFactory
 import distage.config.ConfigModuleDef
 import distage.{HasConstructor, ProviderMagnet}
@@ -18,6 +19,11 @@ object HurricanePlugin extends PluginDef with ConfigModuleDef with ZIODIEffectMo
   makeConfig[AppCfg]("app")
 
   make[String].named("csv").fromValue("hurricanes.csv")
+  make[CSVFormat].fromValue(
+    new DefaultCSVFormat {
+      override val quoting: Quoting = QUOTE_NONNUMERIC
+    }
+  )
 
   make[CsvReader].fromResource(CsvReader.make _)
   make[Logic].fromHas(Logic.make)

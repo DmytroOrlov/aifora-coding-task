@@ -1,6 +1,6 @@
 package hurricane
 
-import com.github.tototoshi.csv.CSVReader
+import com.github.tototoshi.csv.{CSVFormat, CSVReader}
 import distage.Id
 import zio.macros.accessible
 import zio.{IO, Task}
@@ -22,8 +22,9 @@ object CsvReader {
   def make(
       cfg: AppCfg,
       csv: String@Id("csv"),
+      csvFmt: CSVFormat,
   ) = for {
-    reader <- IO(CSVReader.open(fromResource(csv))).toManaged(r => IO(r.close()).ignore)
+    reader <- IO(CSVReader.open(fromResource(csv))(csvFmt)).toManaged(r => IO(r.close()).ignore)
     stringsStreamWithHeader = reader.toStream
     res <- IO {
       val stringsStream = stringsStreamWithHeader.tail
