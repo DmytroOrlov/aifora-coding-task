@@ -2,7 +2,8 @@ package hurricane
 
 import buildinfo.BuildInfo.version
 import cats.syntax.semigroupk._
-import distage.{HasConstructor, Injector, ModuleDef, ProviderMagnet}
+import distage.config.ConfigModuleDef
+import distage.{HasConstructor, Injector, ProviderMagnet}
 import izumi.distage.effect.modules.ZIODIEffectModule
 import org.http4s.HttpRoutes
 import org.http4s.server.Router
@@ -44,7 +45,9 @@ object Main extends App {
     def provideHas[R: HasConstructor, A: Tag](fn: R => A): ProviderMagnet[A] =
       HasConstructor[R].map(fn)
 
-    val module = new ModuleDef with ZIODIEffectModule {
+    val module = new ConfigModuleDef with ZIODIEffectModule {
+      makeConfig[AppCfg]("app")
+      make[String].named("csv").fromValue("hurricanes.csv")
       make[Logic].fromEffect(Logic.make)
       make[Endpoints].fromValue(Endpoints.make)
       many[HttpRoutes[Task]]
@@ -58,4 +61,8 @@ object Main extends App {
       .useEffect
       .exitCode
   }
+}
+
+case class AppCfg(years: List[String]) {
+  val readYears = years.map(y => Year(y.toInt))
 }
