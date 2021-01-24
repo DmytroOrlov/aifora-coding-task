@@ -11,6 +11,7 @@ val V = new {
   val tapir = "0.17.7"
   val sttp = "2.2.9"
   val elastic4s = "7.10.2"
+  val scalaCsv = "1.3.6"
 
   val scalacheck = "1.15.2"
 
@@ -39,6 +40,8 @@ val Deps = new {
 
   val elastic4sClientSttp = "com.sksamuel.elastic4s" %% "elastic4s-client-sttp" % V.elastic4s
   val elastic4sEffectZio = "com.sksamuel.elastic4s" %% "elastic4s-effect-zio" % V.elastic4s
+
+  val scalaCsv = "com.github.tototoshi" %% "scala-csv" % V.scalaCsv
 
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalacheck
 
@@ -75,6 +78,8 @@ lazy val hurricanes = (project in file("."))
 
       Deps.elastic4sClientSttp,
       Deps.elastic4sEffectZio,
+
+      Deps.scalaCsv,
     ),
     addCompilerPlugin(Deps.betterMonadicFor),
     addCompilerPlugin(Deps.kindProjector),
