@@ -50,7 +50,7 @@ val commonSettings = Seq(
   scalaVersion := "2.13.4",
 )
 
-lazy val `aifora-coding-task` = (project in file("."))
+lazy val hurricanes = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
   .settings(commonSettings)
   .settings(
