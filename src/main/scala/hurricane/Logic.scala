@@ -12,7 +12,8 @@ trait Logic {
 
 object Logic {
   val make = for {
-    _ <- zio.IO.unit
+    hurricanes <- CsvReader.readHurricanes
+    hs = hurricanes.toList.map(h => h.month -> h).toMap
   } yield new Logic {
     val most = IO.succeed {
       List(

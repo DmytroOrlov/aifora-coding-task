@@ -47,8 +47,12 @@ object Main extends App {
 
     val module = new ConfigModuleDef with ZIODIEffectModule {
       makeConfig[AppCfg]("app")
+
       make[String].named("csv").fromValue("hurricanes.csv")
-      make[Logic].fromEffect(Logic.make)
+
+      make[CsvReader].fromResource(CsvReader.make _)
+      make[Logic].fromHas(Logic.make)
+
       make[Endpoints].fromValue(Endpoints.make)
       many[HttpRoutes[Task]]
         .addHas(Main.logicRoutes)
