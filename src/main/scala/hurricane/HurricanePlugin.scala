@@ -21,7 +21,7 @@ object HurricanePlugin extends PluginDef with ConfigModuleDef with ZIODIEffectMo
   make[String].named("csv").fromValue("hurricanes.csv")
   make[CSVFormat].fromValue(
     new DefaultCSVFormat {
-      override val quoting: Quoting = QUOTE_NONNUMERIC
+      override val escapeChar: Char = '\''
     }
   )
 

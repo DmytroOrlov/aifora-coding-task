@@ -1,5 +1,6 @@
 package hurricane
 
+import cats.syntax.option._
 import com.github.tototoshi.csv.{CSVFormat, CSVReader}
 import distage.Id
 import zio.macros.accessible
@@ -30,11 +31,15 @@ object CsvReader {
       val stringsStream = stringsStreamWithHeader.tail
       stringsStream.map {
         case month :: average :: hurricanes =>
+          val hs = cfg.readYears.zip(hurricanes).map { case (y, hs) => y -> hs.trim.toInt }.toMap
           HurricaneLine(
             Month(month),
-            average.toDouble,
-            cfg.readYears.zip(hurricanes).map { case (y, hs) => y -> hs.toInt }.toMap
-          )
+            average.trim.toDouble,
+            hs
+          ).some
+        case _ => none
+      }.collect {
+        case Some(h) => h
       }
     }.toManaged_
   } yield new CsvReader {
