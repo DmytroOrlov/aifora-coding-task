@@ -7,6 +7,6 @@ package object hurricane {
 
   implicit val yearCodec: PlainCodec[Year] =
     implicitly[PlainCodec[Int]].map(Year)(_.value)
-  implicit val monthCodec: PlainCodec[Year] =
-    implicitly[PlainCodec[Int]].map(Year)(_.value)
+  implicit val monthCodec: PlainCodec[Month] =
+    implicitly[PlainCodec[String]].map(Month)(_.value)
 }
