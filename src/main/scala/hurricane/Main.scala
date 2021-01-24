@@ -2,9 +2,9 @@ package hurricane
 
 import buildinfo.BuildInfo.version
 import cats.syntax.semigroupk._
-import distage.config.ConfigModuleDef
-import distage.{HasConstructor, Injector, ProviderMagnet}
-import izumi.distage.effect.modules.ZIODIEffectModule
+import distage.Injector
+import izumi.distage.plugins.PluginConfig
+import izumi.distage.plugins.load.PluginLoader
 import org.http4s.HttpRoutes
 import org.http4s.server.Router
 import sttp.tapir.docs.openapi._
@@ -38,30 +38,18 @@ object Main extends App {
     )
   } yield router
 
+  val program = HttpServer.bindHttp *> ZIO.never
+
   def run(args: List[String]) = {
-    val program =
-      HttpServer.bindHttp *> ZIO.never
-
-    def provideHas[R: HasConstructor, A: Tag](fn: R => A): ProviderMagnet[A] =
-      HasConstructor[R].map(fn)
-
-    val module = new ConfigModuleDef with ZIODIEffectModule {
-      makeConfig[AppCfg]("app")
-
-      make[String].named("csv").fromValue("hurricanes.csv")
-
-      make[CsvReader].fromResource(CsvReader.make _)
-      make[Logic].fromHas(Logic.make)
-
-      make[Endpoints].fromValue(Endpoints.make)
-      many[HttpRoutes[Task]]
-        .addHas(Main.logicRoutes)
-      make[HttpServer].fromHas(HttpServer.make _)
-      make[UIO[Unit]].from(provideHas(program.provide))
-    }
+    val pluginConfig = PluginConfig.cached(
+      packagesEnabled = Seq(
+        "hurricane",
+      )
+    )
+    val appModules = PluginLoader().load(pluginConfig)
 
     Injector()
-      .produceGetF[Task, UIO[Unit]](module)
+      .produceGetF[Task, UIO[Unit]](appModules.merge)
       .useEffect
       .exitCode
   }
