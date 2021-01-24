@@ -1,4 +1,4 @@
-ThisBuild / organization := "com.example"
+ThisBuild / organization := "com.dmytroorlov"
 ThisBuild / version := "1.0-SNAPSHOT"
 ThisBuild / scalacOptions ++= Seq(
   "-Ymacro-annotations",
