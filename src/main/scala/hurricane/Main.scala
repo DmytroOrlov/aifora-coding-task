@@ -1,16 +1,9 @@
 package hurricane
 
 import buildinfo.BuildInfo.version
+import cats.syntax.semigroupk._
 import distage.{HasConstructor, Injector, ModuleDef, ProviderMagnet}
 import izumi.distage.effect.modules.ZIODIEffectModule
-import org.http4s.HttpRoutes
-import zio._
-import zio.console._
-import org.http4s.server.Router
-import buildinfo.BuildInfo.version
-import cats.syntax.semigroupk._
-import izumi.distage.plugins.PluginConfig
-import izumi.distage.plugins.load.PluginLoader
 import org.http4s.HttpRoutes
 import org.http4s.server.Router
 import sttp.tapir.docs.openapi._
@@ -31,12 +24,14 @@ object Main extends App {
       "/" -> ((possibility.toRoutes { month =>
         Logic.possibility(month)
           .map(HurricanePossibility(_))
+          .either
           .provide(env)
       }: HttpRoutes[Task]) <+> most.toRoutes { _ =>
         Logic.most
-          .map {
+          .map(_.map {
             case (year, month) => MostHurricanes(year, month)
-          }.provide(env)
+          }).either
+          .provide(env)
       } <+>
         new SwaggerHttp4s(docs.toYaml).routes)
     )
@@ -50,8 +45,8 @@ object Main extends App {
       HasConstructor[R].map(fn)
 
     val module = new ModuleDef with ZIODIEffectModule {
-      make[Console.Service].fromHas(Console.live)
-
+      make[Logic].fromEffect(Logic.make)
+      make[Endpoints].fromValue(Endpoints.make)
       many[HttpRoutes[Task]]
         .addHas(Main.logicRoutes)
       make[HttpServer].fromHas(HttpServer.make _)
