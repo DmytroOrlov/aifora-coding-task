@@ -26,5 +26,16 @@ class HurricaneTest extends DistageBIOEnvSpecScalatest[ZIO] with OptionValues wi
           )
         ))
     }
+    "fail for absent month in possibility" in {
+      for {
+        er <- Logic.possibility(Month("Jan")).either
+        erMsg = er.left.value.continue(new LogicErr[String] {
+          override def empty: String = ???
+
+          override def noPossibility(month: Month): String = s"no $month"
+        })
+        _ = assert(erMsg === "no Month(Jan)")
+      } yield ()
+    }
   }
 }
