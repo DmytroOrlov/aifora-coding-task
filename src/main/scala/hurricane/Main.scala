@@ -24,7 +24,10 @@ object Main extends App {
     router = Router[Task](
       "/" -> ((possibility.toRoutes { month =>
         Logic.possibility(month)
-          .map(HurricanePossibility(_))
+          .bimap(
+            _.continue(new LogicErr.AsFailureResp {}),
+            HurricanePossibility(_)
+          )
           .either
           .provide(env)
       }: HttpRoutes[Task]) <+> most.toRoutes { _ =>

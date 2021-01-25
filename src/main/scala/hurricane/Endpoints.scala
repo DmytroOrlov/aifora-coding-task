@@ -15,7 +15,7 @@ trait Endpoints {
 
 case class MostHurricanes(year: Year, month: Month)
 
-case class HurricanePossibility(value: Double)
+case class HurricanePossibility(estimatedPossibility: Double)
 
 case class FailureResp(error: String)
 
