@@ -44,5 +44,14 @@ class HurricaneTest extends DistageBIOEnvSpecScalatest[ZIO] with OptionValues wi
         _ = assert(may === 1.0 - Math.pow(Math.E, -average))
       } yield ()
     }
+    "return most = 8" in {
+      for {
+        (year, month) <- Logic.most
+
+        hs <- CsvReader.readHurricanes
+        hurricanes = hs.toList.map(h => h.month -> h).toMap.apply(month).hurricanes(year)
+        _ = assert(hurricanes === 8)
+      } yield ()
+    }
   }
 }
