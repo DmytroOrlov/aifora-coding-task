@@ -4,15 +4,27 @@ import izumi.distage.testkit.scalatest.DistageBIOEnvSpecScalatest
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{EitherValues, OptionValues}
-import zio.ZIO
+import zio._
 
 class HurricaneTest extends DistageBIOEnvSpecScalatest[ZIO] with OptionValues with EitherValues with TypeCheckedTripleEquals with Matchers {
-  "" must {
-    "" in {
-      for {
-        _ <- zio.IO.unit
-        _ = fail("123")
-      } yield ()
+  "Logic" must {
+    "fail for no data in most" in {
+      (for {
+        er <- Logic.most.either
+        erMsg = er.left.value.continue(new LogicErr[String] {
+          override def empty: String = "empty data"
+
+          override def noPossibility(month: Month): String = ???
+        })
+        _ = assert(erMsg === "empty data")
+      } yield ())
+        .provideLayer(ZLayer.fromEffect(
+          Logic.make.provide(
+            Has(new CsvReader {
+              val readHurricanes = UIO(Stream.empty)
+            })
+          )
+        ))
     }
   }
 }

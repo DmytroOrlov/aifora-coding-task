@@ -13,7 +13,7 @@ trait Logic {
 }
 
 object Logic {
-  val make = for {
+  val make: ZIO[Has[CsvReader], Throwable, Logic] = for {
     hs <- CsvReader.readHurricanes
     hurricanes = hs.toList.map(h => h.month -> h).toMap
   } yield new Logic {
