@@ -37,5 +37,12 @@ class HurricaneTest extends DistageBIOEnvSpecScalatest[ZIO] with OptionValues wi
         _ = assert(erMsg === "no Month(Jan)")
       } yield ()
     }
+    "return possibility for May (average = 0.1)" in {
+      for {
+        may <- Logic.possibility(Month("May"))
+        average = 0.1
+        _ = assert(may === 1.0 - Math.pow(Math.E, -average))
+      } yield ()
+    }
   }
 }
