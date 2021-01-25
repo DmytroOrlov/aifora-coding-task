@@ -8,7 +8,7 @@ import zio.macros.accessible
 
 @accessible
 trait Endpoints {
-  def most: UIO[Endpoint[Unit, FailureResp, List[MostHurricanes], Nothing]]
+  def most: UIO[Endpoint[Unit, FailureResp, MostHurricanes, Nothing]]
 
   def possibility: UIO[Endpoint[Month, FailureResp, HurricanePossibility, Nothing]]
 }
@@ -28,7 +28,7 @@ object Endpoints {
     val most = IO.succeed {
       endpoint.get
         .in("most")
-        .out(jsonBody[List[MostHurricanes]])
+        .out(jsonBody[MostHurricanes])
         .errorOut(jsonBody[FailureResp])
     }
 

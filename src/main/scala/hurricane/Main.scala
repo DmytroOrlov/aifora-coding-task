@@ -29,9 +29,10 @@ object Main extends App {
           .provide(env)
       }: HttpRoutes[Task]) <+> most.toRoutes { _ =>
         Logic.most
-          .map(_.map {
-            case (year, month) => MostHurricanes(year, month)
-          }).either
+          .bimap(
+            _.continue(new LogicErr.AsFailureResp {}), {
+              case (year, month) => MostHurricanes(year, month)
+            }).either
           .provide(env)
       } <+>
         new SwaggerHttp4s(docs.toYaml).routes)
